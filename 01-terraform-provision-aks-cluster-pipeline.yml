@@ -24,7 +24,7 @@ stages:
       - task: PublishPipelineArtifact@1
         inputs:
           targetPath: '$(System.DefaultWorkingDirectory)/terraform-manifests'
-          artifact: 'terraform-manifest-out'
+          artifact: 'terraform-manifests-out'
           publishLocation: 'pipeline'
       - task: TerraformInstaller@0
         inputs:
@@ -32,7 +32,7 @@ stages:
       - task: TerraformCLI@0
         inputs:
           command: 'init'
-          workingDirectory: '$(System.DefaultWorkingDirectory)terraform-manifests'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-manifests'
           backendType: 'azurerm'
           backendServiceArm: 'terraform-aks-azurerm-svc-con'
           backendAzureRmResourceGroupName: 'terraform-storage-rg'

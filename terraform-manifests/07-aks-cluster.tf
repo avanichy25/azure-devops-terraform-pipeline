@@ -85,15 +85,15 @@ azure_active_directory_role_based_access_control {
 
 # Windows Profile
   windows_profile {
-    admin_username = var.windows_user
-    admin_password = var.windows_password
+    admin_username = var.windows_admin_username
+    admin_password = var.windows_admin_password
   }
 
 # Linux Profile
   linux_profile {
     admin_username = "ubuntu"
     ssh_key {
-      key_data = file(var.ssh_keys)
+      key_data = file(var.ssh_public_key)
     }
   }
 

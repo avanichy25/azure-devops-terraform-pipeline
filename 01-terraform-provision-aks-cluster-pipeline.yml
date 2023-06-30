@@ -1,0 +1,51 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+- name: DEV_ENVIRONMENT
+  value: dev
+- name: QA_ENVIORNMENT
+  value: qa
+
+stages:
+  - stage: TerraformValidate
+    jobs:
+    - job: TerraformJob
+      continueOnError: false
+      steps:
+      - task: PublishPipelineArtifact@1
+        inputs:
+          targetPath: '$(System.DefaultWorkingDirectory)/terraform-manifests'
+          artifact: 'terraform-manifest-out'
+          publishLocation: 'pipeline'
+      - task: TerraformInstaller@0
+        inputs:
+          terraformVersion: 'latest'
+      - task: TerraformCLI@0
+        inputs:
+          command: 'init'
+          workingDirectory: '$(System.DefaultWorkingDirectory)terraform-manifests'
+          backendType: 'azurerm'
+          backendServiceArm: 'terraform-aks-azurerm-svc-con'
+          backendAzureRmResourceGroupName: 'terraform-storage-rg'
+          backendAzureRmStorageAccountName: 'terraformstoragergdev'
+          backendAzureRmContainerName: 'tfstatefiles'
+          backendAzureRmKey: 'terraform.tfstate'
+          allowTelemetryCollection: false
+      
+      - task: TerraformCLI@0
+        inputs:
+          command: 'validate'
+          workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-manifests'
+          allowTelemetryCollection: false
+
+      
+      

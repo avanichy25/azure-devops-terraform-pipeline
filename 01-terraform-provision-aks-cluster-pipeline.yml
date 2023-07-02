@@ -81,6 +81,14 @@ stages:
                   commandOptions: '-var ssh_public_key=$(sshkey.secureFilePath) -var environment=$(DEV_ENVIRONMENT)'
                   environmentServiceName: 'terraform-aks-azurerm-svc-con'
                   allowTelemetryCollection: false
+              
+              - task: TerraformCLI@0
+                inputs:
+                  command: 'apply'
+                  workingDirectory: '$(Pipeline.Workspace)/terraform-manifests-out'
+                  environmentServiceName: 'terraform-aks-azurerm-svc-con'
+                  allowTelemetryCollection: false
+              
         
 
       

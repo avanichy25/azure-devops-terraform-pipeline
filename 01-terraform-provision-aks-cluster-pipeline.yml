@@ -46,6 +46,42 @@ stages:
           command: 'validate'
           workingDirectory: '$(System.DefaultWorkingDirectory)/terraform-manifests'
           allowTelemetryCollection: false
+  
+  - stage: Deployakscluster
+    jobs:
+      - deployment: deploy
+        pool:
+          vmImage: ubuntu-latest
+        environment: $(DEV_ENVIORNMENT)
+        strategy:
+         runOnce:
+          deploy:
+            steps:
+              - task: DownloadSecureFile@1
+                name: sshkey
+                inputs:
+                 secureFile: 'aksprodsshkey.pub'
+              
+              - task: TerraformCLI@0
+                inputs:
+                  command: 'init'
+                  workingDirectory: '$(Pipeline.Workspace)/terraform-manifests-out'
+                  backendType: 'azurerm'
+                  backendServiceArm: 'terraform-aks-azurerm-svc-con'
+                  backendAzureRmResourceGroupName: 'terraform-storage-rg'
+                  backendAzureRmStorageAccountName: 'terraformstoragergdev'
+                  backendAzureRmContainerName: 'tfstatefiles'
+                  backendAzureRmKey: 'terraform.tfstate'
+                  allowTelemetryCollection: false
+              
+              - task: TerraformCLI@0
+                inputs:
+                  command: 'plan'
+                  workingDirectory: '$(Pipeline.Workspace)/terraform-manifests-out'
+                  commandOptions: '-var ssh_public_key=$(sshkey.secureFilePath) -var environment=$(DEV_ENVIRONMENT)'
+                  environmentServiceName: 'terraform-aks-azurerm-svc-con'
+                  allowTelemetryCollection: false
+        
 
       
       
